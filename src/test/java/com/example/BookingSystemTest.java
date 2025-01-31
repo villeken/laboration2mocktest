@@ -10,12 +10,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-//import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -83,7 +81,6 @@ public class BookingSystemTest {
                 .hasMessageContaining("Sluttid måste vara efter starttid");
     }
 
-
     @ParameterizedTest
     @MethodSource("invalidBookingParameters")
     void shouldThrowExceptionWhenInvalidParametersProvided(String roomId, LocalDateTime startTime, LocalDateTime endTime) {
@@ -138,6 +135,13 @@ public class BookingSystemTest {
 
         assertThat(availableRooms).hasSize(1);
         assertThat(availableRooms.get(0).getId()).isEqualTo("1");
+    }
+
+    @Test
+    void shouldReturnFalseWhenBookingIdNotFound() {
+        boolean result = bookingSystem.cancelBooking("invalid-booking-id");
+
+        assertThat(result).isFalse();
     }
 
 }
