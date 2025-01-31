@@ -71,6 +71,19 @@ public class BookingSystemTest {
                 .hasMessageContaining("Kan inte boka tid i dåtid");
     }
 
+    @Test
+    void shouldThrowExceptionWhenEndTimeIsBeforeStartTime() {
+        LocalDateTime startTime = LocalDateTime.now().plusHours(2);
+        LocalDateTime endTime = startTime.minusHours(1);
+
+        when(timeProvider.getCurrentTime()).thenReturn(LocalDateTime.now());
+
+        assertThatThrownBy(() -> bookingSystem.bookRoom("1", startTime, endTime))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Sluttid måste vara efter starttid");
+    }
+
+
     @ParameterizedTest
     @MethodSource("invalidBookingParameters")
     void shouldThrowExceptionWhenInvalidParametersProvided(String roomId, LocalDateTime startTime, LocalDateTime endTime) {
