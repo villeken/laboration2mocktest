@@ -3,11 +3,15 @@ package com.example;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -39,21 +43,21 @@ public class BookingSystemTest {
         when(roomRepository.findById("1")).thenReturn(Optional.of(room));
     }
 
-   @Test
+    @Test
     void shouldBookRoomWhenValidInput() throws NotificationException {
         LocalDateTime startTime = LocalDateTime.now().plusHours(1);
         LocalDateTime endTime = startTime.plusHours(2);
 
-       when(timeProvider.getCurrentTime()).thenReturn(LocalDateTime.now());
+        when(timeProvider.getCurrentTime()).thenReturn(LocalDateTime.now());
 
-       boolean result = bookingSystem.bookRoom("1", startTime, endTime);
+        boolean result = bookingSystem.bookRoom("1", startTime, endTime);
 
-       assertThat(result).isTrue();
-       verify(roomRepository).save(any(Room.class));
-       verify(notificationService).sendBookingConfirmation(any(Booking.class));
-   }
+        assertThat(result).isTrue();
+        verify(roomRepository).save(any(Room.class));
+        verify(notificationService).sendBookingConfirmation(any(Booking.class));
+    }
 
-   @Test
+    @Test
     void shouldThrowExceptionWhenStartTimeIsInPast() {
         LocalDateTime startTime = LocalDateTime.now().minusHours(1);
         LocalDateTime endTime = startTime.plusHours(2);
@@ -62,9 +66,24 @@ public class BookingSystemTest {
 
         assertThatThrownBy(() -> bookingSystem.bookRoom("1", startTime, endTime))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Can not book time that is in the past.");
-   }
+                .hasMessageContaining("Kan inte boka tid i dåtid");
+    }
 
-   @Test
+
+    @ParameterizedTest
+    @MethodSource("invalidBookingParameters")
+    void shouldThrowExceptionWhenInvalidParametersProvided(String roomId, LocalDateTime startTime, LocalDateTime endTime) {
+        assertThatThrownBy(() -> bookingSystem.bookRoom(roomId, startTime, endTime))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Bokning kräver giltiga start- och sluttider samt rum-id");
+    }
+
+    static Stream<Arguments> invalidBookingParameters() {
+        return Stream.of(
+                Arguments.of(null, LocalDateTime.now().plusHours(1), LocalDateTime.now().plusHours(2)),
+                Arguments.of("1", null, LocalDateTime.now().plusHours(2)),
+                Arguments.of("1", LocalDateTime.now().plusHours(1), null)
+        );
+    }
 
 }
