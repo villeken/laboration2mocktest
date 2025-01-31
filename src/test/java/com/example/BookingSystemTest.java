@@ -16,8 +16,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class BookingSystemTest {
 
@@ -69,7 +68,6 @@ public class BookingSystemTest {
                 .hasMessageContaining("Kan inte boka tid i dåtid");
     }
 
-
     @ParameterizedTest
     @MethodSource("invalidBookingParameters")
     void shouldThrowExceptionWhenInvalidParametersProvided(String roomId, LocalDateTime startTime, LocalDateTime endTime) {
@@ -84,6 +82,24 @@ public class BookingSystemTest {
                 Arguments.of("1", null, LocalDateTime.now().plusHours(2)),
                 Arguments.of("1", LocalDateTime.now().plusHours(1), null)
         );
+    }
+
+    @Test
+    void shouldNotBookRoomWhenRoomIsUnavailable() throws NotificationException {
+        LocalDateTime startTime = LocalDateTime.now().plusHours(1);
+        LocalDateTime endTime = startTime.plusHours(2);
+
+        when(timeProvider.getCurrentTime()).thenReturn(LocalDateTime.now());
+
+        Room room = mock(Room.class);
+        when(room.isAvailable(startTime, endTime)).thenReturn(false);
+        when(roomRepository.findById("1")).thenReturn(Optional.of(room));
+
+        boolean result = bookingSystem.bookRoom("1", startTime, endTime);
+        assertThat(result).isFalse();
+
+        verify(roomRepository, never()).save(any(Room.class));
+        verify(notificationService, never()).sendBookingConfirmation(any(Booking.class));
     }
 
 }
