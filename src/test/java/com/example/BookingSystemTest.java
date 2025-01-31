@@ -138,6 +138,24 @@ public class BookingSystemTest {
     }
 
     @Test
+    void shouldThrowExceptionWhenBookingAlreadyHasStarted() {
+        String bookingId = "valid-booking-id";
+        LocalDateTime startTime = LocalDateTime.now().minusHours(1);
+        LocalDateTime endTime = startTime.plusHours(1);
+
+        Booking booking = new Booking(bookingId, "1", startTime, endTime);
+        room.addBooking(booking);
+        when(roomRepository.findAll()).thenReturn(List.of(room));
+
+        when(timeProvider.getCurrentTime()).thenReturn(LocalDateTime.now());
+
+        assertThatThrownBy(() -> bookingSystem.cancelBooking(bookingId))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Kan inte avboka påbörjad eller avslutad bokning");
+    }
+
+
+    @Test
     void shouldReturnFalseWhenBookingIdNotFound() {
         boolean result = bookingSystem.cancelBooking("invalid-booking-id");
 
