@@ -2,11 +2,17 @@ package com.example;
 
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class BookingSystemTest {
@@ -32,5 +38,33 @@ public class BookingSystemTest {
         room = new Room("1", "Room 1");
         when(roomRepository.findById("1")).thenReturn(Optional.of(room));
     }
+
+   @Test
+    void shouldBookRoomWhenValidInput() throws NotificationException {
+        LocalDateTime startTime = LocalDateTime.now().plusHours(1);
+        LocalDateTime endTime = startTime.plusHours(2);
+
+       when(timeProvider.getCurrentTime()).thenReturn(LocalDateTime.now());
+
+       boolean result = bookingSystem.bookRoom("1", startTime, endTime);
+
+       assertThat(result).isTrue();
+       verify(roomRepository).save(any(Room.class));
+       verify(notificationService).sendBookingConfirmation(any(Booking.class));
+   }
+
+   @Test
+    void shouldThrowExceptionWhenStartTimeIsInPast() {
+        LocalDateTime startTime = LocalDateTime.now().minusHours(1);
+        LocalDateTime endTime = startTime.plusHours(2);
+
+        when(timeProvider.getCurrentTime()).thenReturn(LocalDateTime.now());
+
+        assertThatThrownBy(() -> bookingSystem.bookRoom("1", startTime, endTime))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Can not book time that is in the past.");
+   }
+
+   @Test
 
 }
