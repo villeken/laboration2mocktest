@@ -166,12 +166,21 @@ public class BookingSystemTest {
                 .hasMessageContaining("Kan inte avboka påbörjad eller avslutad bokning");
     }
 
-
     @Test
     void shouldReturnFalseWhenBookingIdNotFound() {
         boolean result = bookingSystem.cancelBooking("invalid-booking-id");
 
         assertThat(result).isFalse();
+    }
+
+    @Test
+    void shouldThrowExceptionWhenBookingIdIsNull() {
+
+        String bookingId = null;
+
+        assertThatThrownBy(() -> bookingSystem.cancelBooking(bookingId))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Boknings-id kan inte vara null");
     }
 
 }
