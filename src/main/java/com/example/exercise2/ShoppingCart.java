@@ -29,6 +29,8 @@ public class ShoppingCart {
         totalPrice -= (int) (product.getPrice() * quantity);
     }
 
+
+
     public int getTotalPrice() {
         return products.entrySet().stream()
                 .mapToInt(entry -> (int) (entry.getKey().getPrice() * entry.getValue()))
