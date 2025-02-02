@@ -28,6 +28,7 @@ public class ShoppingCartTest {
 
     @Test
     void shouldRemoveProductFromShoppingCart() {
+
         Product product = new Product("Singoalla", 28);
 
         shoppingCart.addProduct(product, 2);

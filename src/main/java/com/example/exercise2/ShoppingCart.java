@@ -20,5 +20,18 @@ public class ShoppingCart {
     public int getTotalPrice() {
         return totalPrice;
     }
+
+    public void removeProduct(Product product, int quantity) {
+
+        int currentQuantity = products.getOrDefault(product, 0);
+        if (currentQuantity > quantity) {
+            products.put(product, currentQuantity - quantity);
+        } else {
+            products.remove(product);
+        }
+
+        totalPrice -= (int) (product.getPrice() * quantity);
+    }
+
 }
 
