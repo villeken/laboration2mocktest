@@ -26,4 +26,15 @@ public class ShoppingCartTest {
         assertThat(shoppingCart.getTotalPrice()).isEqualTo(56);
     }
 
+    @Test
+    void shouldRemoveProductFromShoppingCart() {
+        Product product = new Product("Singoalla", 28);
+
+        shoppingCart.addProduct(product, 2);
+
+        shoppingCart.removeProduct(product, 1);
+
+        assertThat(shoppingCart.getTotalPrice()).isEqualTo(28);
+    }
+
 }
