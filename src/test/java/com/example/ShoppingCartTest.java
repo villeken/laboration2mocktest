@@ -38,4 +38,15 @@ public class ShoppingCartTest {
         assertThat(shoppingCart.getTotalPrice()).isEqualTo(28);
     }
 
+    @Test
+    void shouldCalculateTotalPrice() {
+        Product product1 = new Product("Singoalla", 28);
+        Product product2 = new Product("Ballerina", 26);
+
+        shoppingCart.addProduct(product1, 2);
+        shoppingCart.addProduct(product2, 1);
+
+        assertThat(shoppingCart.getTotalPrice()).isEqualTo(82);
+    }
+
 }
