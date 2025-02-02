@@ -17,10 +17,6 @@ public class ShoppingCart {
         totalPrice += (int) (product.getPrice() * quantity);
     }
 
-    public int getTotalPrice() {
-        return totalPrice;
-    }
-
     public void removeProduct(Product product, int quantity) {
 
         int currentQuantity = products.getOrDefault(product, 0);
@@ -31,6 +27,12 @@ public class ShoppingCart {
         }
 
         totalPrice -= (int) (product.getPrice() * quantity);
+    }
+
+    public int getTotalPrice() {
+        return products.entrySet().stream()
+                .mapToInt(entry -> (int) (entry.getKey().getPrice() * entry.getValue()))
+                .sum();
     }
 
 }
