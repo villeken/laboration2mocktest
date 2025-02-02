@@ -52,11 +52,24 @@ public class ShoppingCartTest {
     @Test
     void ApplyTheCorrectDiscountToTotalPrice() {
         Product product1 = new Product("Singoalla", 30);
+
         shoppingCart.addProduct(product1, 2);
 
         shoppingCart.applyDiscount(0.2);
 
         assertThat(shoppingCart.getTotalPrice()).isEqualTo(48);
     }
+
+    @Test
+    void shouldUpdateQuantityCorrectly() {
+        Product product = new Product("Singoalla", 30);
+
+        shoppingCart.addProduct(product, 2);
+
+        shoppingCart.updateQuantity(product, 3);
+
+        assertThat(shoppingCart.getTotalPrice()).isEqualTo(90);
+    }
+
 
 }
