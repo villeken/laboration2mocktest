@@ -30,6 +30,14 @@ public class ShoppingCart {
         totalPrice -= (int) (product.getPrice() * quantity);
     }
 
+    public void updateQuantity(Product product, int updatedQuantity) {
+        if (updatedQuantity > 0) {
+            products.put(product, updatedQuantity);
+        } else {
+            products.remove(product);
+        }
+    }
+
     public void applyDiscount(double discount) {
         this.discount = discount;
     }
