@@ -7,6 +7,7 @@ public class ShoppingCart {
 
     private final Map<Product, Integer> products = new HashMap<>();
     private int totalPrice = 0;
+    private double discount = 0.0;
 
     public void addProduct(Product product, int quantity) {
         if (product == null || quantity <= 0) {
@@ -29,12 +30,16 @@ public class ShoppingCart {
         totalPrice -= (int) (product.getPrice() * quantity);
     }
 
-
+    public void applyDiscount(double discount) {
+        this.discount = discount;
+    }
 
     public int getTotalPrice() {
-        return products.entrySet().stream()
+        int total = products.entrySet().stream()
                 .mapToInt(entry -> (int) (entry.getKey().getPrice() * entry.getValue()))
                 .sum();
+
+        return (int) (total * (1 - discount));
     }
 
 }
